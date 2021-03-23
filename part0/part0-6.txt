@@ -1,0 +1,9 @@
+note over browser:
+browser executes js-code
+that adds new note to list and
+renders new document
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+server-->browser: Status 201
+
