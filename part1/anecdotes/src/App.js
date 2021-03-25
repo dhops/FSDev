@@ -22,7 +22,6 @@ const App = () => {
 
   const handleClick = () => {
     setSelected(Math.floor(Math.random() * anecdotes.length))
-    console.log(votes)
   }
 
   const handleVote = () => {
