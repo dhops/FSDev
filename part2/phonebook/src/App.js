@@ -1,6 +1,33 @@
 import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+    console.log("Here")
+  }
+
+  return (
+    <div className='success'>
+      {message}
+    </div>
+  )
+}
+
+const Error = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
+
 const PersonForm = (props) => {
   return (
     <form onSubmit={props.handleClick}>
@@ -39,6 +66,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterText, setFilterText ] = useState('')
+  const [ notification, setNotification ] = useState(null)
+  const [ errorNotification, setErrorNotification ] = useState(null)
 
   const handleFilter = (event) => {
     setFilterText(event.target.value)
@@ -67,21 +96,44 @@ const App = () => {
           .then(returnedPerson => {
             setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
             })
-        console.log(persons)
+          .then(() => {
+            setNotification(
+                `${person.name} was successfully updated`
+              )
+              setTimeout(() => {
+                setNotification(null)
+              }, 5000)
+            })
+          .catch((error) => {
+            setErrorNotification(
+                `${person.name} was already deleted.`
+              )
+              setTimeout(() => {
+                setNotification(null)
+              }, 5000)
+            })
       }
     }
     else {
-      const personObject = {
+      const person = {
         name: newName,
         number: newNumber
       }
       personService
-        .create(personObject)
+        .create(person)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
         })
+        .then(() => {
+          setNotification(
+              `${person.name} was successfully added`
+            )
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
+          })
     }
   }
 
@@ -105,7 +157,9 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={notification} />
+      <Error message={errorNotification} />
       <Filter handleFilter={handleFilter} filterText={filterText} />
 
       <h3>Add a new person</h3>
