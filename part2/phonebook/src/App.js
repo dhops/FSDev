@@ -35,9 +35,7 @@ const Filter = (props) => {
 
 const App = () => {
 
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', number: '046-617-9292' }
-  ])
+  const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterText, setFilterText ] = useState('')
@@ -60,7 +58,17 @@ const App = () => {
     event.preventDefault()
 
     if (persons.map(person => person.name).includes(newName)) {
-      window.alert(`${newName} is already added to phonebook`);
+      if (window.confirm(`${newName} is already added to phonebook, change number?`)) {
+        const person = persons.find(p => p.name === newName)
+        const changedPerson = { ...person, number: newNumber }
+
+        personService
+          .update(person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+            })
+        console.log(persons)
+      }
     }
     else {
       const personObject = {
@@ -87,10 +95,12 @@ const App = () => {
   }, [])
 
   const handleDelete = (id) => {
-    console.log(id)
-    personService
-      .remove(id)
-      .then(setPersons(persons.filter(p => p.id !== id)))
+    console.log(persons)
+    if (window.confirm(`do you really want to delete ${persons.find(p => p.id === id).name}?`)) {
+      personService
+        .remove(id)
+        .then(setPersons(persons.filter(p => p.id !== id)))
+    }
   }
 
   return (
