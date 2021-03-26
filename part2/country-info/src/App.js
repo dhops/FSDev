@@ -1,26 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Country = ({country}) => (
-  <div>
-    <h2>{country.name}</h2>
-    <p>Capital: {country.capital}</p>
-    <p>Population: {country.population}</p>
-    <ul>
-      {country.languages.map(language =>
-        <li key={language.name}>{language.name}</li>
-      )}
-    </ul>
-    <img src={country.flag} width='200px'></img>
-  </div>
-)
+/*
+const Country = ({country}) => {
+  console.log(country)
+  if (country.length > 0) {
+
+    return (
+      <div>
+        <h2>{country.name}</h2>
+        <p>Capital: {country.capital}</p>
+        <p>Population: {country.population}</p>
+        <ul>
+          {country.languages.map(language =>
+            <li key={language.name}>{language.name}</li>
+          )}
+        </ul>
+        <img src={country.flag} width='200px'></img>
+      </div>
+    )
+  }
+  else {
+    return <div></div>
+  }
+} */
 
 const Countries = ({countriesToShow}) => {
-
   const handleClick = (index) => {
-    return (
-      <Country country={countriesToShow[index]} />
-    )
+    // countriesToShow = countriesToShow[index]
+    console.log(countriesToShow)
   }
 
   if (countriesToShow.length >= 10) {
@@ -34,8 +42,20 @@ const Countries = ({countriesToShow}) => {
     )
   }
   else if (countriesToShow.length === 1) {
-    setCurrentCountry(countriesToShow[0]);
-    <Country country={currentCountry} />
+    const country = countriesToShow[0]
+    return (
+      <div>
+        <h2>{country.name}</h2>
+        <p>Capital: {country.capital}</p>
+        <p>Population: {country.population}</p>
+        <ul>
+          {country.languages.map(language =>
+            <li key={language.name}>{language.name}</li>
+          )}
+        </ul>
+        <img src={country.flag} width='200px'></img>
+      </div>
+    )
   }
   else {
     return (
@@ -54,15 +74,15 @@ const Filter = (props) => {
   )
 }
 
+
 const App = () => {
 
   const [ countries, setCountries ] = useState([])
   const [ filterText, setFilterText ] = useState('')
-  const [ currentCountry, setCurrentCountry ] = useState([])
+  const [ displayCountry, setDisplayCountry ] = useState([])
 
   const handleFilter = (event) => {
     setFilterText(event.target.value)
-    setCurrentCountry([])
   }
 
   const countriesToShow = countries.filter(country => country.name.toLowerCase().includes(filterText.toLowerCase()))
@@ -84,6 +104,7 @@ const App = () => {
 
       <h3>Results</h3>
       <Countries countriesToShow={countriesToShow} />
+
     </div>
   )
 }

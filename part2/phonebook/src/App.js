@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
+import personService from './services/persons'
 
 const PersonForm = (props) => {
   return (
@@ -16,11 +15,13 @@ const PersonForm = (props) => {
   )
 }
 
-const Persons = ({personsToShow}) => {
+const Persons = ({personsToShow, handleDelete}) => {
   return (
     <ul>
       {personsToShow.map(person =>
-        <li key={person.name}>{person.name} {person.number}</li>
+        <div>
+          <li key={person.id}>{person.name} {person.number}<button onClick={() => handleDelete(person.id)}>Delete</button></li>
+        </div>
       )}
     </ul>
   )
@@ -66,20 +67,31 @@ const App = () => {
         name: newName,
         number: newNumber
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
   useEffect(() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons').then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
+
+  const handleDelete = (id) => {
+    console.log(id)
+    personService
+      .remove(id)
+      .then(setPersons(persons.filter(p => p.id !== id)))
+  }
 
   return (
     <div>
@@ -90,7 +102,7 @@ const App = () => {
       <PersonForm handleText={handleText} handleClick={handleClick} handleNumber={handleNumber} newName={newName} newNumber={newNumber}/>
 
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDelete={handleDelete} />
     </div>
   )
 }
